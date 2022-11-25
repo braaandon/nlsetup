@@ -50,12 +50,12 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="D2Filter.cs" />
-    <Compile Include="HotkeyManager.cs" />
-    <Compile Include="NLConfig.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Src\D2Filter.cs" />
+    <Compile Include="Src\HotkeyManager.cs" />
+    <Compile Include="Src\NLConfig.cs" />
+    <Compile Include="Src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util.cs" />
+    <Compile Include="Src\Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
