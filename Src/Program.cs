@@ -12,8 +12,6 @@ namespace nlsetup
             var cfg = NLConfig.Load();
             var client = new NLClient();
 
-            Console.WriteLine("NLClientApp replacement by brandon");
-
             try
             {
                 client.Connect();
