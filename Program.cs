@@ -1,66 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 using NetLimiter.Service;
 
 namespace nlsetup
 {
     internal class Program
     {
-        static string destinyPath = @"C:\program files (x86)\steam\steamapps\common\destiny 2\destiny2.exe";
-
-        static Filter CreateD2Filter(string name, ushort start = 0, ushort end = 0)
+        static void Main()
         {
-            var filt = new Filter(name);
-            filt.Functions.Add(new FFAppIdEqual(new AppId(destinyPath)));
-            if (start > 0 && end > 0) filt.Functions.Add(new FFRemotePortInRange(new PortRangeFilterValue(start, end)));
-            return filt;
-        }
-
-        static void Main(string[] args)
-        {
+            var cfg = NLConfig.Load();
             var client = new NLClient();
+
+            Console.WriteLine("NLClientApp replacement by brandon");
 
             try
             {
                 client.Connect();
-            } catch (Exception e)
+            } catch (Exception)
             {
-                Console.WriteLine(e);
+                // LOGGER: program exit (reason: e)
                 return;
             }
 
-            Console.WriteLine("Attempting to run through NL Protect");
-            client.UACElevate();
+            var keysConverter = new KeysConverter();
 
-            client.SetRegistrationData("", "");
-            Console.WriteLine("Registered License Information");
-
-            Filter[] filters = {
-                CreateD2Filter("Destiny 2"),
-                CreateD2Filter("30k", 30000, 30009), 
-                CreateD2Filter("27k", 27015, 27200),
-                CreateD2Filter("3074", 3074, 3074),
-                CreateD2Filter("7500", 7500, 7509)
+            var filters = new List<D2Filter>
+            {
+                new D2Filter(client, cfg.AppPath, "Destiny 2", Util.GetKey(cfg.Hotkeys[0]), Util.GetModifier(cfg.HotkeyModifier), 800),
+                new D2Filter(client, cfg.AppPath, "3074", Util.GetKey(cfg.Hotkeys[1]), Util.GetModifier(cfg.HotkeyModifier), 1, 3074, 3074),
+                new D2Filter(client, cfg.AppPath, "30000", Util.GetKey(cfg.Hotkeys[2]), Util.GetModifier(cfg.HotkeyModifier), 1, 30000, 30009),
+                new D2Filter(client, cfg.AppPath, "27000", Util.GetKey(cfg.Hotkeys[3]), Util.GetModifier(cfg.HotkeyModifier), 1, 27015, 27200),
+                new D2Filter(client, cfg.AppPath, "7500", Util.GetKey(cfg.Hotkeys[4]), Util.GetModifier(cfg.HotkeyModifier), 1, 7500, 7509)
             };
 
-            foreach(Filter filter in filters)
+            Console.WriteLine("Activate any hotkey to start");
+
+            HotKeyManager.HotKeyPressed += new EventHandler<HotKeyEventArgs>((sender, e) =>
             {
-                uint bps = 1;
+                Console.Clear();
 
-                if (filter.Name == "Destiny 2")
-                    bps = 800;
+                foreach (var filt in filters)
+                {
+                    Console.WriteLine("{0} [{1}]", filt.Name, (filt.IsEnabled() ? "ON" : "OFF"));
+                }
+            });
 
-                client.AddFilter(filter);
-                client.AddRule(filter.Id, new LimitRule(RuleDir.In, bps));
-                client.AddRule(filter.Id, new LimitRule(RuleDir.Out, bps));
-
-                Console.WriteLine($"Created Filter \"{filter.Name}\"");
-            }
-
-            foreach(Rule rule in client.Rules)
-            {
-                rule.IsEnabled = false;
-                client.UpdateRule(rule);
-            }
+            Console.ReadLine();
         }
     }
 }
