@@ -15,9 +15,10 @@ namespace nlsetup
             try
             {
                 client.Connect();
-            } catch (Exception)
+            } catch (Exception e)
             {
-                // LOGGER: program exit (reason: e)
+                Console.WriteLine(e);
+                Console.ReadLine();
                 return;
             }
 
